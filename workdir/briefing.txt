@@ -1,0 +1,7 @@
+CONFIDENTIAL Q3 BOARDROOM BRIEFING
+------------------------------------
+This document is distributed under a broadcast-encrypt,
+individually-decrypt model. Each recipient below has their own
+ML-KEM-768 key wrap of the AES-256 session key that unlocks this
+file. Decrypting it will (in later phases) generate a unique
+invisible watermark and a signed, ledgered decryption record.
