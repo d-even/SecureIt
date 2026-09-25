@@ -11,27 +11,33 @@ key bytes for recipient X."
 """
 
 import os
-from . import kem
+from . import kem, signing
 
 
 def issue_recipient_keypair(keys_dir: str, recipient_id: str) -> None:
-    """Generate and persist a keypair for one recipient. Idempotent-ish:
-    refuses to overwrite an existing identity so you don't accidentally
-    invalidate someone's already-distributed public key."""
+    """Generate and persist BOTH keypairs a recipient needs:
+      - an ML-KEM-768 keypair (public.key / secret.key)   -> decryption
+      - an ML-DSA-65  keypair (signing_public.key / signing_secret.key) -> signing
+    Idempotent-ish: refuses to overwrite an existing identity so you don't
+    accidentally invalidate someone's already-distributed public keys."""
     recipient_dir = os.path.join(keys_dir, recipient_id)
     if os.path.exists(recipient_dir):
         raise FileExistsError(f"Recipient '{recipient_id}' already has keys at {recipient_dir}")
     os.makedirs(recipient_dir)
 
     public_key, secret_key = kem.generate_recipient_keypair()
-
     with open(os.path.join(recipient_dir, "public.key"), "wb") as f:
         f.write(public_key)
-    # In a real deployment this file lives on the recipient's device / HSM,
+    # In a real deployment secret keys live on the recipient's device / HSM,
     # never on a shared server. Here it's just co-located for the demo.
     with open(os.path.join(recipient_dir, "secret.key"), "wb") as f:
         f.write(secret_key)
 
+    signing_public_key, signing_secret_key = signing.generate_signing_keypair()
+    with open(os.path.join(recipient_dir, "signing_public.key"), "wb") as f:
+        f.write(signing_public_key)
+    with open(os.path.join(recipient_dir, "signing_secret.key"), "wb") as f:
+        f.write(signing_secret_key)
 
 def load_public_key(keys_dir: str, recipient_id: str) -> bytes:
     path = os.path.join(keys_dir, recipient_id, "public.key")
@@ -41,6 +47,17 @@ def load_public_key(keys_dir: str, recipient_id: str) -> bytes:
 
 def load_secret_key(keys_dir: str, recipient_id: str) -> bytes:
     path = os.path.join(keys_dir, recipient_id, "secret.key")
+    with open(path, "rb") as f:
+        return f.read()
+
+def load_signing_public_key(keys_dir: str, recipient_id: str) -> bytes:
+    path = os.path.join(keys_dir, recipient_id, "signing_public.key")
+    with open(path, "rb") as f:
+        return f.read()
+
+
+def load_signing_secret_key(keys_dir: str, recipient_id: str) -> bytes:
+    path = os.path.join(keys_dir, recipient_id, "signing_secret.key")
     with open(path, "rb") as f:
         return f.read()
 

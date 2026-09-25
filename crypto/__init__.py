@@ -1,3 +1,3 @@
-from . import aes, kem, keystore, manifest
+from . import aes, kem, keystore, manifest, signing, record
 
-__all__ = ["aes", "kem", "keystore", "manifest"]
+__all__ = ["aes", "kem", "keystore", "manifest", "signing", "record"]
