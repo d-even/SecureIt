@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SecureShare — Trace every leaked copy to its recipient</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<nav class="nav" aria-label="Main">
+  <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>SecureShare</a>
+  <div class="nav-links">
+    <a href="#problem">Problem</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#trace">Tracing</a>
+    <a href="#standards">Standards</a>
+  </div>
+  <a class="btn btn-yellow btn-sm" href="#" target="_blank" rel="noopener">Open live demo</a>
+</nav>
+
+<main id="main">
+
+<!-- ================= HERO ================= -->
+<header class="hero" id="top">
+  <div class="hero-copy">
+    <h1 class="hero-title">Identical copies.<br>Individual fingerprints.</h1>
+    <p class="hero-lede">
+      SecureShare encrypts a document once and embeds an invisible,
+      per-recipient fingerprint the moment each person decrypts it. If a copy
+      leaks, you can prove whose it was, with a post-quantum signature and a
+      ledger no single administrator can edit.
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-yellow" href="#" target="_blank" rel="noopener">Open live demo</a>
+      <a class="btn btn-outline" href="#architecture">Read the architecture</a>
+    </div>
+  </div>
+
+  <figure class="specimen" aria-labelledby="specimen-caption">
+    <div class="specimen-head">
+      <div>
+        <p class="specimen-title">Board briefing, Q3</p>
+        <p class="specimen-meta">Encrypted once, decrypted by 3 recipients</p>
+      </div>
+      <button class="btn btn-outline btn-sm" id="reveal-btn" aria-pressed="false">Reveal fingerprints</button>
+    </div>
+    <div class="docs" id="docs"></div>
+    <figcaption class="specimen-caption" id="specimen-caption">
+      To the eye, all three copies are the same. Each one carries its own session ID
+      four times over, in characters that don't render.
+    </figcaption>
+  </figure>
+</header>
+
+<!-- ================= PROBLEM ================= -->
+<section class="section" id="problem">
+  <h2 class="section-title">Why group leaks usually go unsolved</h2>
+  <div class="problem-grid">
+    <div class="problem-cell">
+      <h3>The copies are identical</h3>
+      <p>Every recipient decrypts the same bytes, so a leaked file carries no trace of which decryption produced it.</p>
+    </div>
+    <div class="problem-cell">
+      <h3>Access logs can be rewritten</h3>
+      <p>Server logs sit under a privileged administrator who can quietly alter or erase the record.</p>
+    </div>
+    <div class="problem-cell">
+      <h3>Static watermarks repeat the problem</h3>
+      <p>A mark added before distribution is the same for everyone, so it points at the whole group, not a person.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ARCHITECTURE ================= -->
+<section class="section arch" id="architecture">
+  <h2 class="section-title">Four layers, built at the moment of decryption</h2>
+  <p class="section-lede">Scroll to assemble the stack. The highlighted layer is the one described.</p>
+
+  <div class="arch-scroller">
+    <div class="arch-sticky" id="arch-sticky">
+      <svg id="iso-svg" viewBox="190 160 520 470" role="img" aria-label="Isometric diagram of the four SecureShare layers"></svg>
+    </div>
+
+    <div class="arch-steps">
+      <article class="step" data-layer="0" data-side="left">
+        <div class="step-panel">
+          <span class="tag">Layer 0</span>
+          <h3>Encryption foundation</h3>
+          <p>The document is encrypted once with AES-256-GCM. Its key is wrapped
+          separately for each recipient with ML-KEM-768, so no classical RSA or
+          ECC is used anywhere in the key exchange.</p>
+        </div>
+      </article>
+
+      <article class="step" data-layer="1" data-side="right">
+        <div class="step-panel">
+          <span class="tag">Layer 1</span>
+          <h3>Forensic fingerprint</h3>
+          <p>When a recipient decrypts, a watermark tied to that session is
+          embedded invisibly. Reed-Solomon error correction lets it survive
+          partial copies, screenshots and JPEG re-compression.</p>
+        </div>
+      </article>
+
+      <article class="step" data-layer="2" data-side="left">
+        <div class="step-panel">
+          <span class="tag">Layer 2</span>
+          <h3>Non-repudiation</h3>
+          <p>The recipient signs the decryption record with their own ML-DSA-65
+          private key. Only they could have produced that signature, so they
+          can't later deny opening the file.</p>
+        </div>
+      </article>
+
+      <article class="step" data-layer="3" data-side="right">
+        <div class="step-panel">
+          <span class="tag">Layer 3</span>
+          <h3>Tamper-evident ledger</h3>
+          <p>Two of three independent validator organizations endorse the record
+          before it joins a hash-chained, append-only ledger. Editing any entry
+          breaks both the chain and the signatures.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TRACE ================= -->
+<section class="section" id="trace">
+  <h2 class="section-title">From leaked file to named recipient</h2>
+  <ol class="trace">
+    <li class="trace-step">
+      <span class="marker" aria-hidden="true">1</span>
+      <h3>Distribute</h3>
+      <p>The sender uploads a file and picks recipients. It's encrypted once and wrapped for each of them.</p>
+    </li>
+    <li class="trace-step">
+      <span class="marker" aria-hidden="true">2</span>
+      <h3>Decrypt</h3>
+      <p>A recipient opens it. The fingerprint, signature and ledger entry are created in the same action.</p>
+    </li>
+    <li class="trace-step">
+      <span class="marker" aria-hidden="true">3</span>
+      <h3>Leak</h3>
+      <p>A copy turns up outside the group, whole or as a pasted fragment.</p>
+    </li>
+    <li class="trace-step">
+      <span class="marker" aria-hidden="true">4</span>
+      <h3>Trace</h3>
+      <p>The fingerprint is extracted, matched on the ledger and verified against the recipient's signature.</p>
+    </li>
+  </ol>
+</section>
+
+<!-- ================= STANDARDS ================= -->
+<section class="section" id="standards">
+  <h2 class="section-title">What each part runs on</h2>
+  <div class="table-wrap">
+    <table class="spec">
+      <thead>
+        <tr><th scope="col">Job</th><th scope="col">Method</th><th scope="col">Standard</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Encrypt the document</td><td>AES-256-GCM</td><td>NIST SP 800-38D</td></tr>
+        <tr><td>Wrap each recipient's key</td><td>ML-KEM-768 (Kyber)</td><td>NIST FIPS 203</td></tr>
+        <tr><td>Sign the decryption record</td><td>ML-DSA-65 (Dilithium)</td><td>NIST FIPS 204</td></tr>
+        <tr><td>Survive partial and pasted leaks</td><td>Zero-width steganography with Reed-Solomon</td><td>Project method</td></tr>
+        <tr><td>Survive screenshots</td><td>DCT-domain QIM watermark</td><td>Project method</td></tr>
+        <tr><td>Stop retroactive edits</td><td>Hash chain with 2-of-3 endorsement</td><td>Project method</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="table-note">Verified by 74 automated tests, including deliberate tamper attempts on the ledger.</p>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>SecureShare</a>
+      <p>Runs fully offline. No cloud key service, no public blockchain.</p>
+    </div>
+    <div class="footer-links">
+      <!-- <a href="#" target="_blank" rel="noopener">Live demo</a>
+      <a href="#docs" target="_blank" rel="noopener">API reference</a> -->
+      <a href="https://github.com/d-even/SecureIt">GitHub repository</a>
+      <!-- <a href="#">README</a> -->
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

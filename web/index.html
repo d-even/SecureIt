@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SecureShare</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="brand"><span class="dot"></span> SecureShare</div>
+  <nav>
+    <button class="tab-btn active" data-tab="sender">Distribute</button>
+    <button class="tab-btn" data-tab="recipient">Decrypt</button>
+    <button class="tab-btn" data-tab="trace">Trace a leak</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ============ SENDER ============ -->
+  <section id="tab-sender" class="tab-panel active">
+    <div class="grid">
+
+      <div class="col">
+        <h2>New distribution</h2>
+        <p class="muted">Encrypt a real file once, wrap the key for each recipient you pick below.</p>
+
+        <div class="card">
+          <label>Document</label>
+          <input type="file" id="sender-file">
+
+          <label>Recipients</label>
+          <div id="sender-recipient-checks" class="check-list"></div>
+
+          <button id="sender-distribute-btn">Encrypt &amp; distribute</button>
+          <div id="sender-result" class="result"></div>
+        </div>
+      </div>
+
+      <div class="col">
+        <h2>Recipients</h2>
+        <div class="card">
+          <label>Add a recipient</label>
+          <div class="inline">
+            <input type="text" id="new-recipient-id" placeholder="e.g. priya_kapoor">
+            <button id="add-recipient-btn">Issue keys</button>
+          </div>
+          <div id="add-recipient-result" class="result"></div>
+        </div>
+
+        <h2>Distributed documents</h2>
+        <div class="card">
+          <button id="refresh-documents-btn" class="secondary">Refresh</button>
+          <table id="documents-table">
+            <thead><tr><th>Document ID</th><th>Recipients</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ RECIPIENT ============ -->
+  <section id="tab-recipient" class="tab-panel">
+    <h2>Decrypt a document</h2>
+    <p class="muted">This performs decrypt + sign + watermark + ledger commit in one real action.</p>
+    <div class="card narrow">
+      <label>Document</label>
+      <select id="recipient-doc-select"></select>
+
+      <label>You are</label>
+      <select id="recipient-id-select"></select>
+
+      <button id="decrypt-btn" class="secondary">Refresh lists</button>
+      <button id="decrypt-submit-btn">Decrypt</button>
+
+      <div id="decrypt-result" class="result"></div>
+    </div>
+  </section>
+
+  <!-- ============ TRACE ============ -->
+  <section id="tab-trace" class="tab-panel">
+    <h2>Trace a leaked file</h2>
+    <p class="muted">Upload whatever copy leaked — a full file or a partial fragment.</p>
+    <div class="card narrow">
+      <label>Leaked file</label>
+      <input type="file" id="trace-file">
+      <button id="trace-btn">Extract watermark &amp; look up ledger</button>
+      <div id="trace-result" class="result"></div>
+    </div>
+
+    <h2>Ledger integrity</h2>
+    <div class="card narrow">
+      <button id="verify-chain-btn" class="secondary">Verify entire chain</button>
+      <div id="verify-result" class="result"></div>
+    </div>
+  </section>
+
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
